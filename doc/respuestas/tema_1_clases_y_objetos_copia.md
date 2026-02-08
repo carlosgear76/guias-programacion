@@ -424,8 +424,33 @@ Distancia entre (3.0,4.0) y (7.0,1.0) = 5.0
 ## 14. El paso del `Punto` como parámetro a un método, es **por copia** o **por referencia**, es decir, si se cambia el valor de algún atributo del punto pasado como parámetro, dichos cambios afectan al objeto fuera del método? ¿Qué ocurre si en vez de un `Punto`, se recibiese un entero (`int`) y dicho entero se modificase dentro de la función? 
 
 ### Respuesta
+Paso de parámetros en Java
+Para OBJETOS (como Punto):
+Se pasa la REFERENCIA por valor (copia de la referencia).
 
+void modificarPunto(Punto p) {
+    p.setX(100);  // ¡MODIFICA el objeto original!
+    p = new Punto(99, 99);  // NO afecta fuera
+}
 
+// Uso:
+Punto p = new Punto(3, 4);
+modificarPunto(p);
+System.out.println(p.getX());  // 100 (modificado)
+ Para PRIMITIVOS (como int):
+Se pasa por COPIA (valor).
+
+java
+void modificarEntero(int n) {
+    n = 100;  // NO afecta fuera
+}
+
+// Uso:
+int x = 5;
+modificarEntero(x);
+System.out.println(x);  // 5 (NO cambia)
+
+ 
 ## 15. ¿Qué es el método `toString()` en Java? ¿Existe en otros lenguajes? Pon un ejemplo de `toString()` en la clase `Punto` en Java
 
 ### Respuesta
@@ -470,8 +495,135 @@ String texto = "Punto: " + p;    // "Punto: (3.5, 4.2)"
 
 
 ### Respuesta
+Clase vs Struct
+Similitud básica:
+Ambos agrupan datos relacionados.
+
+c
+// C struct - solo datos
+struct Punto { double x, y; };
+
+// Java class - datos + más
+class Punto { private double x, y; }
+ ¿Qué le falta al struct para ser clase?
+1. Comportamiento (métodos)
+c
+// C: funciones separadas
+double distancia(struct Punto p1, p2) { /* externa */ }
+
+// Java: métodos integrados
+class Punto {
+    double distanciaA(Punto otro) { /* interna */ }
+}
+2. Encapsulamiento
+c
+// C: todo público (acceso directo)
+p.x = 10;  //  Siempre permitido
+
+// Java: control de acceso
+p.setX(10);  // Con validaciones posible
+3. Constructores
+c
+// C: inicialización manual
+struct Punto p = {3, 4};  // o asignación manual
+
+// Java: inicialización garantizada
+Punto p = new Punto(3, 4);  // Constructor obliga valores
+4. Gestión memoria automática
+c
+// C: manual (malloc/free)
+struct Punto* p = malloc(...);
+free(p);  // ¡Obligatorio!
+
+// Java: automática (Garbage Collector)
+Punto p = new Punto(...);
+// JVM limpia solo
+5. Herencia/polimorfismo
+c
+// C: no existe (solo composición)
+// Java: fundamental para OOP
+class Circulo extends Figura { ... }
+ Diferencia clave:
+Struct = Datos pasivos (solo contenedor)
+
+Clase = Datos activos (datos + comportamiento + relaciones)
+
+Struct → Clase necesita: métodos, encapsulamiento, constructores, herencia, gestión automática memoria.
+
 
 
 ## 17. Quitemos un poco de magia a todo esto: ¿Como se podría “emular”, con `struct` en C, la clase `Punto`, con su función para calcular la distancia al origen? ¿Qué ha pasado con `this`?
 
 ### Respuesta
+Emulando clase en C con struct
+Struct "Punto" en C:
+c
+// punto.h - "Clase" Punto en C
+typedef struct {
+    double x;   // "Atributos" públicos
+    double y;
+} Punto;
+
+// "Constructor"
+Punto crearPunto(double x, double y);
+
+// "Método" distancia al origen
+double distanciaAlOrigen(Punto* este);
+ Implementación:
+c
+// punto.c
+#include <math.h>
+
+// "Constructor"
+Punto crearPunto(double x, double y) {
+    Punto p;
+    p.x = x;
+    p.y = y;
+    return p;
+}
+
+// "Método" - ¡Recibe puntero explícito!
+double distanciaAlOrigen(Punto* este) {
+    // this → se pasa EXPLÍCITAMENTE como puntero
+    return sqrt(este->x * este->x + este->y * este->y);
+}
+ Uso:
+c
+#include <stdio.h>
+
+int main() {
+    // new → llamada a función
+    Punto p = crearPunto(3.0, 4.0);
+    
+    // p.distanciaAlOrigen() → función con puntero
+    double d = distanciaAlOrigen(&p);
+    
+    printf("Distancia: %.2f\n", d);  // 5.0
+    return 0;
+}
+ ¿Qué pasa con this?
+En Java (implícito):
+
+
+p.distanciaAlOrigen();  // this = p (automático)
+En C (explícito):
+
+
+distanciaAlOrigen(&p);  // "this" = &p (manual)
+this en C es:
+Puntero explícito pasado como primer parámetro
+
+Manual → tú debes pasar &p
+
+Visible en la firma de la función
+
+ Lo que falta (la "magia"):
+ Encapsulamiento → todo público
+
+ Métodos integrados → funciones separadas
+
+ this automático → puntero manual
+
+ Gestión memoria → manual
+
+ Sobrecarga → nombres únicos
