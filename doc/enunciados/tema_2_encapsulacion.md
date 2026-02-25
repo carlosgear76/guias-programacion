@@ -16,8 +16,10 @@ Por favor, escribe en impersonal las respuestas.
 
 ## 1. En Programación Orientada a Objetos (POO), ¿Qué buscan la **encapsulación** y **la ocultación** de información? Enumera brevemente algunas ventajas de la ocultación de información.
 
-### Respuesta
-
+### Respuesta:
+La Encapsulación tiene que ver con la Protección de los objetos en el algoritmo.
+-Usandloa se evitan los estados no validos de los objetos.
+-Tambien evita dependencias desde fuera que no se desean.
 
 ## 2. ¿Qué se entiende por la **interfaz pública** de un objeto o clase en POO? Describe brevemente cómo se relaciona con la ocultación de información.
 
