@@ -43,8 +43,33 @@ int main() {
 
 ## 2. Brevemente ¿Qué es una **"excepción"**? ¿Con qué objetivo las usa un programador cuando implementa funciones o cuando las llama?
 
-### Respuesta
+### Respuesta:
 
+Una excepción es un mecanismo para señalar que ha ocurrido una situación anómala o inesperada durante la ejecución de un programa.
+No es simplemente un error: es un evento que interrumpe el flujo normal del programa y que puede (y debe) gestionarse de forma controlada.
+
+¿Para qué las usa un programador?
+Cuando implementa funciones
+
+El programador lanza excepciones para:
+
+Indicar que una precondición no se cumple (ej: parámetro inválido).
+Señalar que ocurrió un fallo que la función no puede resolver por sí sola.
+Evitar devolver códigos de error ambiguos.
+Separar claramente la lógica normal del manejo de errores.
+
+Ejemplo conceptual:
+
+“Si el divisor es 0, lanzo una excepción en vez de devolver un valor inválido.”
+
+Cuando llama funciones
+
+El programador las usa para:
+
+Capturar y manejar errores sin que el programa termine abruptamente.
+Tomar decisiones alternativas si algo falla.
+Registrar información del fallo (mensaje, tipo, origen).
+Mantener el programa robusto.
 
 ## 3. Reescribe el mismo ejemplo de raiz, pero en Java, metiendo ese método en una clase `Calculadora` y llama a dicho método desde el método `main`, mostrando cómo se puede controlar desde fuera.
 
