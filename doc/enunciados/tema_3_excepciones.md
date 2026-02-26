@@ -16,7 +16,29 @@ Por favor, escribe en impersonal las respuestas.
 
 ## 1. Empecemos un tema sobre control de errores en lenguajes de programación, con algo básico. En C, donde no existen las excepciones, pongamos un ejemplo de una raíz que toma número flotante positivo. Queremos controlar el error si la función recibe un número negativo. El usuario debe ser informado pero desde fuera de la función `raiz` ¿Cómo indicamos ese error?. Enumera dos opciones diferentes de diseñar, poniendo un ejemplo de código de cada una.
 
-### Respuesta
+### Respuesta:
+#include <stdio.h>
+#include <math.h>
+
+float raiz(float x) {
+    if (x < 0) {
+        return NAN;   // Indicamos error
+    }
+    return sqrtf(x);
+}
+
+int main() {
+    float numero = -4.0;
+    float resultado = raiz(numero);
+
+    if (isnan(resultado)) {
+        printf("Error: no se puede calcular la raíz de un número negativo.\n");
+    } else {
+        printf("Resultado: %.2f\n", resultado);
+    }
+
+    return 0;
+}
 
 
 ## 2. Brevemente ¿Qué es una **"excepción"**? ¿Con qué objetivo las usa un programador cuando implementa funciones o cuando las llama?
