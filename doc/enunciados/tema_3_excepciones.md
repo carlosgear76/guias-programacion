@@ -78,42 +78,206 @@ Mantener el programa robusto.
 
 ## 4. ¿Qué es **"lanzar"** una excepción? ¿Qué es **"controlar"** o **"capturar"** una excepción? ¿Qué es que se **"propague"** una excepción? ¿Qué le va ocurriendo a las funciones en la pila de llamadas por donde se va propagando la excepción? ¿Las funciones que no la controlan se reanudan después de alguna forma? Explica con el mismo ejemplo anterior en Java de la raíz cuadrada.
 
-### Respuesta
+### Respuesta:
+Supongamos que tenemos esta función:
+
+double raiz(double x) {
+    if (x < 0) {
+        throw new IllegalArgumentException("No se puede calcular la raíz de un número negativo");
+    }
+    return Math.sqrt(x);
+}
+1 Lanzar (throw) una excepción
+
+Significado: La función detecta un error y “lanza” una señal que indica que algo salió mal.
+
+En el ejemplo: throw new IllegalArgumentException(...) lanza la excepción cuando x < 0.
+
+Esto detiene inmediatamente la ejecución normal de raiz() y la pasa a quien pueda manejarla.
+
+2 Controlar o capturar (catch) una excepción
+
+Significado: Alguna función que llama a raiz() decide “atrapar” el error para manejarlo sin que el programa termine abruptamente.
+
+Ejemplo:
+
+try {
+    double r = raiz(-4);
+    System.out.println("Raíz: " + r);
+} catch (IllegalArgumentException e) {
+    System.out.println("Error: " + e.getMessage());
+}
+
+Aquí, el catch captura la excepción y permite que el programa continúe ejecutándose normalmente después del bloque.
+
+3 Propagar una excepción
+
+Significado: Si una función no captura la excepción, ésta “sube” por la pila de llamadas hasta encontrar un manejador que sí la controle.
+
+La pila de llamadas es como una lista de funciones activas: main → otraFunc → raiz.
+
+Si raiz() lanza la excepción y otraFunc no la captura, entonces sigue subiendo hasta main.
+
+double otraFunc(double x) {
+    return raiz(x); // Si x < 0, la excepción se propaga desde aquí
+}
+
+La excepción propaga automáticamente, y las funciones que no la controlan no se reanudan. Se “desenrolla” la pila, eliminando cada llamada que no la captura, hasta que se encuentra un catch o termina el programa con error.
 
 
 ## 5. ¿Qué ventajas tiene frente a C, la **"propagación natural"** de las excepciones a través de la pila (*stack*) de llamadas?
 
-### Respuesta
+### Respuesta:
+La propagación natural de excepciones en Java frente a C permite:
+
+Evitar revisar cada llamada: las funciones intermedias no necesitan chequear errores.
+
+Código más limpio: la lógica principal no se mezcla con control de errores.
+
+Seguridad: funciones intermedias no se ejecutan con datos inválidos.
+
+Mayor información: se puede pasar un objeto excepción con detalles, no solo un código.
+
+En C, todo esto se haría manualmente con códigos de error y comprobaciones en cada función.
 
 
 ## 6. En orientación a objetos, ¿las excepciones suelen ser objetos? ¿Qué ventajas tiene esto en términos de encapsulación? ¿Podemos entonces crear excepciones personalizadas?
 
-### Respuesta
+### Respuesta:
+Sí, en orientación a objetos las excepciones son objetos (por ejemplo, en Java heredan de Throwable).
+
+Ventajas de la encapsulación:
+
+La información sobre el error (mensaje, tipo, pila de llamadas) está guardada dentro del objeto, accesible solo mediante métodos.
+
+Permite manejar errores sin exponer detalles internos de la función que los lanza.
+
+Excepciones personalizadas:
+
+Sí, podemos crear nuestras propias clases de excepción para representar errores específicos de nuestra aplicación.
 
 
 ## 7. En relación con las ventajas de la encapsulación, comparando el ejemplo en C con Java. ¿Qué **información esencial** lleva cualquier **objeto excepción** que es muy útil tener cuando se llega a un manejador?
 
-### Respuesta
+### Respuesta:
+En Java, cualquier objeto excepción suele llevar información esencial como:
+
+Tipo de excepción: qué clase de error ocurrió.
+
+Mensaje descriptivo: explicación del error.
+
+Pila de llamadas (stack trace): dónde se lanzó la excepción y por qué camino llegó al manejador.
+
+En C, normalmente solo se tiene un código de error, sin detalles ni rastreo de la pila.
 
 
 ## 8. En Java, sobre el bloque **"try-catch"**, ¿se pueden tener más de un bloque `catch`? ¿cuántos bloques `catch` se ejecutan?
 
-### Respuesta
+### Respuesta:
+Sí, en Java se pueden tener varios bloques catch para un mismo try.
+
+Solo se ejecuta uno: el primero cuyo tipo de excepción coincida con la lanzada.
+
+Los demás bloques catch se ignoran.
 
 
 ## 9. Si las excepciones producen rupturas en el código llamador, ¿cómo podemos garantizar que se ejecuta siempre finalmente un código necesario para cierre de ficheros, liberacion de recursos, antes de que continúe propagándose la excepción? Pon un ejemplo en Java con `finally`, tanto con `catch` como sin él.
 
-### Respuesta
+### Respuesta:
+En Java, usamos el bloque finally para garantizar que cierto código se ejecute siempre, ya sea que se capture la excepción o no. Esto es útil para cerrar ficheros, liberar recursos, etc.
+
+Ejemplo con catch:
+import java.io.*;
+
+public class Ejemplo {
+    public static void main(String[] args) {
+        FileReader fr = null;
+        try {
+            fr = new FileReader("archivo.txt");
+            int c = fr.read();
+            System.out.println("Primer caracter: " + c);
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
+        } finally {
+            // Este código se ejecuta siempre
+            if (fr != null) {
+                try { fr.close(); } catch (IOException e) { }
+                System.out.println("Archivo cerrado en finally");
+            }
+        }
+        System.out.println("Programa continúa...");
+    }
+}
+
+Aunque ocurra un IOException y se ejecute el catch, el finally siempre se ejecuta.
+
+Ejemplo sin catch (propagando la excepción):
+import java.io.*;
+
+public class Ejemplo {
+    public static void main(String[] args) throws IOException {
+        FileReader fr = null;
+        try {
+            fr = new FileReader("archivo.txt");
+            int c = fr.read();
+            System.out.println("Primer caracter: " + c);
+        } finally {
+            // Se ejecuta incluso si la excepción se propaga
+            if (fr != null) {
+                fr.close();
+                System.out.println("Archivo cerrado en finally");
+            }
+        }
+        // Si ocurrió excepción, aquí nunca se llega; si no, continúa
+        System.out.println("Programa continúa...");
+    }
+}
 
 
 ## 10. En Java, el bloque `finally` puede ir sin `catch`? ¿Se ejecuta siempre tanto si ocurre como si no ocurre una excepción? ¿Y si hay un `return` en medio del `try`?
 
-### Respuesta
+### Respuesta:
+Sí, en Java un bloque finally puede ir sin catch.
+
+Se ejecuta siempre, tanto si ocurre una excepción como si no.
+
+Incluso si hay un return en el try, el código de finally se ejecuta antes de que el método realmente retorne.
 
 
 ## 11. En Java, qué son las excepciones **"controladas"** y las **"no controladas"**? ¿Qué papel juega `RuntimeException`? Pon un ejemplo de excepciones típicas controladas y no controladas que incluso nosotros mismos podríamos usar. Haz dos listas con 3 o 4 ejemplos de situación donde se suele preferir una excepción controlada y donde se suele preferir una excepción no controlada.
 
-### Respuesta
+### Respuesta:
+Excepciones controladas (checked): el compilador obliga a capturarlas o declararlas. Suelen representar errores previsibles fuera del control del programa.
+
+Ejemplo: IOException, SQLException.
+
+Excepciones no controladas (unchecked): heredan de RuntimeException; no es obligatorio capturarlas. Representan errores de programación.
+
+Ejemplo: NullPointerException, IllegalArgumentException.
+
+RuntimeException sirve de base para excepciones no controladas.
+
+Ejemplos típicos
+
+Excepciones controladas:
+
+Lectura de un archivo que puede no existir → FileNotFoundException
+
+Conexión a base de datos → SQLException
+
+Parse de un número desde un fichero externo → NumberFormatException (controlada si se decide)
+
+Excepciones no controladas:
+
+División por cero → ArithmeticException
+
+Acceso a un índice inválido en un array → ArrayIndexOutOfBoundsException
+
+Argumento inválido en un método → IllegalArgumentException
+
+Referencia nula → NullPointerException
+
+Regla práctica: usa controladas cuando el error puede ocurrir por factores externos; usa no controladas cuando el error indica fallo de programación.
 
 
 ## 12. ¿Qué es y para qué se usa `throws`? ¿Por qué es alternativa a capturar una excepción controlada?
